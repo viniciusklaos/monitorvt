@@ -79,3 +79,6 @@ if [ -z "$JAEXISTE" ]; then
 else
 	update;
 fi
+
+
+# RAFAEL COELHO AJUSTE
