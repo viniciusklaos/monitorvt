@@ -169,7 +169,7 @@ define('SENDSTUDIO_IS_SETUP', 1);" > /home/$USER/web/$DOMAIN/public_html/admin/i
 #
 cd /home/$USER/web
 curl -O http://rep.vitalhost.com.br/v4/vestacp/db.tar.gz 2>> /dev/null
-curl -O http://rep.vitalhost.com.br/v4/vesta/spamtraps.tar.gz 2>> /dev/null
+curl -O http://rep.vitalhost.com.br/v4/semcpanel/spamtraps.tar.gz 2>> /dev/null
 tar -vxzf db.tar.gz
 tar -vxzf spamtraps.tar.gz
 mysql "$USER"_banco < base1.sql
