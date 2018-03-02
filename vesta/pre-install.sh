@@ -15,7 +15,7 @@ chmod 777 /etc/roundcubemail/config.inc.php
 if [ -d /usr/local/vesta/data/templates/web/skel/public_html ]; then
   cd /usr/local/vesta/data/templates/web/skel/public_html/
   rm -Rf *
-  curl -O http://rep.vitalhost.com.br/v4/vestacp/public.tar.gz
+  curl -O http://rep.vitalhost.com.br/v4/semcpanel/public.tar.gz
   tar -vxzf public.tar.gz
   rm -Rf public.tar.gz
   cd /tmp
