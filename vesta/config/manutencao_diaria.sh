@@ -141,8 +141,14 @@ processar_backups (){
 }
 
 processar_emails (){
-	find /home/*/mail/*/*/new/ -type f -daystart -mtime +3.5 | xargs rm -f {}/;
-	echo "Limpeza dos emails - $DATAGERAL" >> /var/log/manutencao.log
+	for dominio in `v-list-users | tail -n +3 | awk '{print "v-list-web-domains "$1" | tail -n +3"}' | bash | awk '{print $1}' | sed '/vesta./d'`; do
+		for conta in `find /home/*/web -type d -name $dominio | cut -d/ -f3`; do
+        	for email in `find /home/$conta/mail/$dominio/ -type d  | cut -d/ -f6 | uniq | tail -n +2`; do
+        	    find /home/$conta/mail/$dominio/$email/new/ -type f -daystart -mtime +2.5 | xargs rm -f {}/;
+        	    echo "Limpeza : /home/$conta/mail/$dominio/$email/new/ - $DATAGERAL"
+        	done;
+    	done;
+	done;
 }
 
 
@@ -153,6 +159,9 @@ if [ -f /etc/pmta/config ]; then
 	processar_spool_pmta;
 	PMTATAMANHO=`du -sh /var/spool/pmta | awk '{print $1}'`
 	echo "$PMTATAMANHO" | grep -q G && PMTATAMANHO=`echo "$PMTATAMANHO" | cut -d'G' -f1` || sleep 0;
+	echo "$PMTATAMANHO" | grep -q M && PMTATAMANHO=`echo "$PMTATAMANHO" | cut -d'M' -f1` || sleep 0;
+	echo "$PMTATAMANHO" | grep -q K && PMTATAMANHO=`echo "$PMTATAMANHO" | cut -d'K' -f1` || sleep 0;
+	PMTATAMANHO=`echo $PMTATAMANHO | bc | cut -d. -f1`
 	if [ $PMTATAMANHO -ge "15" ]; then
         limparpmta;
 	fi
@@ -164,6 +173,9 @@ processar_spool_exim;
 
 EXIMTAMANHO=`du -sh /var/spool/exim/input | awk '{print $1}'`
 echo "$EXIMTAMANHO" | grep -q G && EXIMTAMANHO=`echo "$EXIMTAMANHO" | cut -d'G' -f1` || sleep 0;
+echo "$EXIMTAMANHO" | grep -q M && EXIMTAMANHO=`echo "$EXIMTAMANHO" | cut -d'M' -f1` || sleep 0;
+echo "$EXIMTAMANHO" | grep -q K && EXIMTAMANHO=`echo "$EXIMTAMANHO" | cut -d'K' -f1` || sleep 0;
+EXIMTAMANHO=`echo $EXIMTAMANHO | bc | cut -d. -f1`
 
 if [ $EXIMTAMANHO -ge "25" ]; then
         limparexim;
