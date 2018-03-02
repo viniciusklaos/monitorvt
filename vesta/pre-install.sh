@@ -13,17 +13,16 @@ chmod 777 /etc/roundcubemail/config.inc.php
 > /etc/exim/exim.pl
 # PUBLIC_HTML padrao
 if [ -d /usr/local/vesta/data/templates/web/skel/public_html ]; then
-	cd /usr/local/vesta/data/templates/web/skel/public_html/
-	rm -Rf *
-	curl -O http://rep.vitalhost.com.br/v4/semcpanel/public.tar.gz
-	tar -vxzf public.tar.gz
-	rm -Rf public.tar.gz
-	rm -Rf base.tar.gz
-	cd /tmp
+  cd /usr/local/vesta/data/templates/web/skel/public_html/
+  rm -Rf *
+  curl -O http://rep.vitalhost.com.br/v4/vestacp/public.tar.gz
+  tar -vxzf public.tar.gz
+  rm -Rf public.tar.gz
+  cd /tmp
 fi
 # Criacao das pastas VT
-[ -d /home/vtinstall/vartemp ] || mkdir -p /home/vtinstall/vartemp; sleep 0;
-[ -d /home/vtinstall/scripts ] || mkdir -p /home/vtinstall/scripts; sleep 0;
+[ -d /home/vtinstall/vartemp ] || mkdir -p /home/vtinstall/vartemp;
+[ -d /home/vtinstall/scripts ] || mkdir -p /home/vtinstall/scripts;
 echo "$DOMAIN" > /home/vtinstall/vartemp/dominiobase
 #
 # Download dos packs do VESTA
@@ -87,15 +86,12 @@ echo "" > /etc/motd
 echo "Bem vindo(a)" >> /etc/motd
 echo "Servidor de plataforma VestaCP" >> /etc/motd
 echo "" >> /etc/motd
-echo "Comandos:" >> /etc/motd
-echo "status - ipuso - ips - dominios - instalar" >> /etc/motd
-echo "" >> /etc/motd
 #
 # Ajutes de memoria RAM para o MySQL
 if ! grep -q innodb_buffer_pool_size /etc/my.cnf; then
-	RAM=`free -m | grep Mem: | awk '{print $2}'`
-	POOL=`echo "scale=2; (($RAM / 100 * 60) * 1024 * 1024) " | bc | cut -d. -f1`
-	sed -i "2s/^/innodb_buffer_pool_size = $POOL\n/" /etc/my.cnf
+  RAM=`free -m | grep Mem: | awk '{print $2}'`
+  POOL=`echo "scale=2; (($RAM / 100 * 25) * 1024 * 1024) " | bc | cut -d. -f1`
+  sed -i "2s/^/innodb_buffer_pool_size = $POOL\n/" /etc/my.cnf
 fi
 #
 sed -i '/^#/d' /etc/my.cnf
@@ -104,6 +100,7 @@ sed -i '/max_user_connections/d' /etc/my.cnf
 sed -i '/wait_timeout/d' /etc/my.cnf
 sed -i '/interactive_timeout/d' /etc/my.cnf
 sed -i '/long_query_time/d' /etc/my.cnf
+sed -i '/symbolic-links/d' /etc/my.cnf
 #
 # Pagina de suspensao personalizada com chat:
 echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
