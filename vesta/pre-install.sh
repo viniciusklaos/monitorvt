@@ -26,8 +26,8 @@ fi
 echo "$DOMAIN" > /home/vtinstall/vartemp/dominiobase
 #
 # Download dos packs do VESTA
-curl -O http://rep.vitalhost.com.br/v4/vestacp/pack.tar.gz
-tar -vxzf pack.tar.gz
+curl -O http://rep.vitalhost.com.br/v4/vestacp/pack.zip
+unzip -q pack.zip
 #
 cat remover > /usr/local/bin/remover
 cat dedicar > /usr/local/bin/dedicar
@@ -59,8 +59,8 @@ chmod a+x /usr/local/bin/suspender
 chmod a+x /usr/local/bin/installpmta
 #
 # Download dos configs do VESTA
-curl -O http://rep.vitalhost.com.br/v4/vestacp/config.tar.gz
-tar -vxzf config.tar.gz
+curl -O http://rep.vitalhost.com.br/v4/vestacp/config.zip
+unzip -q config.zip
 #
 cat php.ini > /etc/php.ini
 cat exim.conf > /etc/exim/exim.conf
