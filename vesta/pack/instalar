@@ -110,15 +110,40 @@ cd /home/vtinstall/vartemp/
 curl -s -O http://rep.vitalhost.com.br/v4/semcpanel/vitchun.info 2>> /dev/null
 PASS=`cat /home/vtinstall/vartemp/vitchun.info`
 rm -f /home/vtinstall/vartemp/vitchun.info
-MAINIP=`ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | grep -n ^ | grep -w ^1 | cut -f2 -d:`
-SECIP=`ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | grep -n ^ | grep -w ^2 | cut -f2 -d:`
+MAINIP=`v-list-sys-ips | tail -n +3 | tail -2 | awk '{print $1}' | head -1`
+SECIP=`v-list-sys-ips | tail -n +3 | tail -2 | awk '{print $1}' | tail -1`
 SPF=`ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | cut -f1-3 -d. | uniq | sed 's/^/+ip4:/' | sed 's/$/.0\/24 /' | sed 's/ //g' |sed ':a;$!N;s/\n/ /;ta;'`
 v-add-user $USER $PASS contato@$DOMAIN default $DOMAIN Vesta 2>> /dev/null
 v-add-domain $USER $DOMAIN $MAINIP 2>> /dev/null
-v-add-dns-record $USER $DOMAIN ns1 NS $MAINIP 2>> /dev/null
-v-add-dns-record $USER $DOMAIN ns2 NS $SECIP 2>> /dev/null
-v-add-dns-record $USER $DOMAIN smtp A $IPDD 2>> /dev/null
-v-change-dns-record $USER $DOMAIN 17 "\"v=spf1 +a +mx $SPF ~all\""
+
+v-change-dns-domain-tpl $USER $DOMAIN child-ns no 2>> /dev/null
+v-change-dns-domain-soa $USER $DOMAIN ns1.$DOMAIN no 2>> /dev/null
+
+NS2FIELD=`v-list-dns-records $USER $DOMAIN | grep -w ns2.*.A | awk '{print $1}'`
+SPFIELD=`v-list-dns-records $USER $DOMAIN | grep -w  v=spf1 | awk '{print $1}'`
+
+v-change-dns-record $USER $DOMAIN $NS2FIELD $SECIP 2>> /dev/null
+v-change-dns-record $USER $DOMAIN $SPFIELD "\"v=spf1 +a +mx $SPF ~all\"" 2>> /dev/null
+v-add-dns-record $USER $DOMAIN vesta A $MAINIP 2>> /dev/null
+
+for SMTPFIELD in `v-list-dns-records $USER $DOMAIN | grep -w smtp | awk '{print $1}'`; do
+	v-delete-dns-record $USER $DOMAIN $SMTPFIELD;
+done;
+
+for IP in `v-list-sys-ips | tail -n +3 | awk '{print $1}' | sed "/$MAINIP/d"`; do
+	v-add-dns-record $USER $DOMAIN smtp A $IP 2>> /dev/null; 
+done;
+
+v-delete-mail-domain-dkim $USER $DOMAIN 2>> /dev/null
+v-add-mail-domain-dkim $USER $DOMAIN 2>> /dev/null
+
+sed -i "s/180/5400/g" /home/$USER/conf/dns/$DOMAIN.db 2>> /dev/null
+
+if grep -w -q "180" /usr/local/vesta/func/domain.sh; then
+	echo "Corrigindo TTL Serial do VESTA..."
+	sed -i "s/180/5400/g" /usr/local/vesta/func/domain.sh 2>> /dev/null
+fi
+
 v-add-mail-account $USER $DOMAIN contato $PASS 1024 2>> /dev/null
 v-add-mail-account $USER $DOMAIN erros $PASS 1024 2>> /dev/null
 v-add-mail-account $USER $DOMAIN postmaster $PASS 1024 2>> /dev/null
@@ -176,4 +201,3 @@ echo -e "smtp.$DOMAIN > $IPDD"
 echo ""
 echo ""
 echo -e "Instalacao concluida.${RESET}"
-
