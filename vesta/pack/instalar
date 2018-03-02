@@ -145,7 +145,7 @@ if grep -w -q "180" /usr/local/vesta/func/domain.sh; then
 fi
 
 v-add-mail-account $USER $DOMAIN contato $PASS 1024 2>> /dev/null
-v-add-mail-account $USER $DOMAIN erros $PASS 1024 2>> /dev/null
+v-add-mail-account $USER $DOMAIN erros red17pmta 1024 2>> /dev/null
 v-add-mail-account $USER $DOMAIN postmaster $PASS 1024 2>> /dev/null
 v-add-mail-account $USER $DOMAIN abuse $PASS 1024 2>> /dev/null
 v-add-database $USER banco dbuser phCA24bgK mysql localhost 2>> /dev/null
@@ -183,6 +183,12 @@ IEMLOGIN=`echo $DOMAIN | cut -d. -f1`
 
 mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = 'erros@${DOMAIN}' WHERE area = 'BOUNCE_ADDRESS';"
 mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = 'contato@${DOMAIN}' WHERE area = 'EMAIL_ADDRESS';"
+mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = 'mail.${DOMAIN}' WHERE area = 'BOUNCE_SERVER';"
+mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = 'erros@${DOMAIN}' WHERE area = 'BOUNCE_USERNAME';"
+mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = 'red17pmta' WHERE area = 'BOUNCE_PASSWORD';"
+mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = '/notls' WHERE area = 'BOUNCE_EXTRASETTINGS';"
+mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = '1' WHERE area = 'BOUNCE_AGREEDELETE';"
+mysql -u root ${USER}_banco -e "UPDATE email_config_settings SET areavalue = '1' WHERE area = 'BOUNCE_AGREEDELETEALL';"
 mysql -u root ${USER}_banco -e "UPDATE email_users SET emailaddress = 'contato@${DOMAIN}';"
 mysql -u root ${USER}_banco -e "UPDATE email_users SET usertimezone = 'GMT-3:00';"
 mysql -u root ${USER}_banco -e "UPDATE email_users SET username = '${IEMLOGIN}' WHERE username ='changeme';"
